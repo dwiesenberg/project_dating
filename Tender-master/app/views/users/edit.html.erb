@@ -1,0 +1,142 @@
+<nav class="light-blue accent-1">
+  <div class="nav-wrapper">
+    <a href="/user/<%= current_user.id %>" class="brand-logo left">Tender</a> 
+    <ul id="nav-mobile" class="right hide-on-med-and-down" style="margin-left:1000px">
+      <li><a href="/user/<%= current_user.id %>">DASHBOARD</a></li>
+      <li><a href="/logout">LOG OUT</a></li>
+    </ul>
+  </div>
+</nav>
+
+
+  <div class="containerRegister container" >
+    <div class="row">
+      <div class="input-field col s6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title font">Edit Your Profile</h3>
+          </div>
+          <form action="/users/<%= @user.id %>" method="post">
+            <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+            <input class="btn waves-light btn-large red accent-1" type="submit" value="Delete Your Profile">
+            <input type="hidden"name="_method"value="delete">
+          </form>        
+          <p class="edit_profile"><a class="hover" href="/personal/<%=@user.id%>/edit">Edit Your Personal Questions</a></p>
+
+          <div class="panel-body z-depth-4">
+          <div class="profile_body">
+            <form action= "/users/<%=@user.id%>/update" method="post" enctype="multipart/form-data">
+              <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+              <fieldset class="z-depth-1">
+              <div class="form-group">
+                <p>
+                  <b>First Name:</b>
+                <input class="form-control validate" name="user[first_name]" type="text" value="<%= @user.first_name %>">
+                </p>
+              </div>
+              <div class="form-group">
+                <p>
+                  <b>Last Name:</b>
+                <input class="form-control validate" value="<%=@user.last_name%>" name="user[last_name]" type="text">
+                </p>
+              </div>
+              <div class="form-group">
+                <p>
+                  <b>Email:</b>
+                  <input class="form-control validate" value="<%=@user.email%>" name="user[email]" type="email">
+                </p>
+              </div>
+              <div class="form-group">
+                <p>
+                  <b>Height</b>(in inches): 
+                <input class="form-control validate" value="<%=@user.height%>" name="user[height]" type="number" step="any">
+                </p>
+              </div>
+              <div class="form-group">
+                <p>
+                  <b>Nationality:</b>
+                <input class="form-control validate" value="<%=@user.nationality%>" name="user[nationality]" type="text">
+              </p>
+              </div>
+              <div class="form-group">
+                <p>
+                  <b>Sex:</b>
+                  <select name="user[sex]">
+                    <% gender.each do |g| %>
+                    <% if @user.sex == g %>
+                    <option value="<%= g %>" selected><%= g %></option>
+                    <% else %>
+                    <option value="<%= g %>"><%= g %></option>
+                    <% end %>
+                    <% end %>
+                  </select>
+              </p>
+              </div>
+              <div class="form-group">
+                <p>
+                  <b>City:</b>
+                  <select name="user[city]">
+                    <% cities.each do |city| %>
+                    <% if city == @user.city %>
+                      <option value="<%= city %>" selected><%= city %></option>
+                    <% else %>
+                      <option value="<%= city %>"><%= city %></option>
+                    <% end %>
+                    <% end %>
+                  </select>
+                </p>
+              </div>
+              <div class="form-group">
+                <p>
+                 <b> State: </b>
+                <select name="user[state]">
+                  <% us_states.each do |state| %>
+                  <% if state == @user.state%>
+                    <option value="<%= state %>" selected> <%= state %></option>
+                  <% else %>
+                    <option value="<%= state %>"><%= state %></option>
+                  <% end %>
+                  <% end %>
+                </select>
+              </p>
+              </div>
+              <div class="form-group">
+                <p>
+                <b>  Birthday: </b>
+                <input class="form-control validate" value="<%=@user.birthday%>" name="user[birthday]" type="date">
+              </p>
+              </div>
+              <div class="form-group">
+                <p>
+                <b>  Password: </b>
+                <input class="form-control validate" placeholder="Password" value="<%=@user.password%>" name="user[password]" type="password">
+              </p>
+              </div>
+              <div class="form-group">
+                <p>
+                <b>  Password Confirmation: </b>
+                <input class="form-control validate" placeholder="Password Confirmation" value="<%=@user.password_confirmation%>" name="user[password_confirmation]" type="password">
+              </p>
+              </div>
+              <div class="form-group">
+                <p> 
+                <b>  Profile Picture: </b>
+                  <input class="form-control validate" value="<%=@user.avatar%>" name="user[avatar]" type="file">
+                </p>
+              </div>
+              <input type="hidden" name="_method" value="patch">
+              <br>
+              <input class="btn waves-light btn-large light-blue accent-1" type="submit" value="Update">
+              </fieldset>
+            </form>
+          </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    $('select:not([multiple])').material_select();
+  </script>
+
+ 

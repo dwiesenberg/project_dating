@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  geographical_area: MyString
+  sex: MyString
+  min_age: 1
+  max_age: 1
+  user_id: 1
+
+two:
+  geographical_area: MyString
+  sex: MyString
+  min_age: 1
+  max_age: 1
+  user_id: 1

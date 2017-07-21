@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  score: 1
+  thumb: 1
+  matcher: one
+  matched: one
+
+two:
+  score: 1
+  thumb: 1
+  matcher: two
+  matched: two

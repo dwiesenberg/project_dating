@@ -1,0 +1,62 @@
+<nav class="light-blue accent-1">
+  <div class="nav-wrapper">
+    <a href="/user/<%= current_user.id %>" class="brand-logo left">Tender</a> 
+    <ul id="nav-mobile" class="right hide-on-med-and-down" style="margin-left:1000px">
+      <li><a href="/user/<%= current_user.id %>">DASHBOARD</a></li>
+      <li><a href="/logout">LOG OUT</a></li>
+    </ul>
+  </div>
+</nav>
+
+
+<h4 class="font center-align">You are chatting with <a href="/users/<%= @match_id.id %>/profile"><span class=name><%= @match_id.first_name %></span></a></h4>
+
+<div id="chatbox" class="z-depth-4"></div>
+
+ <div class="row ">
+    <form class="col s12" id="chat-form">
+      <div class="row">
+        <div class="input-field col s4">
+        <input type="hidden" id="chat-name" value="<%= @user.first_name%>">
+        <input type="hidden" value="<%= @match_id.id %>" id="match_id">
+        <input id="textbox" class="input-filed col s12" placeholder="Enter message here" required>
+        </div>
+        <input class="btn waves-light light-blue accent-1 send" type="submit" value="Send">
+    </form>
+  </div>
+
+<script type="text/javascript">
+    var socket = io.connect("http://tenderchat.herokuapp.com", {force_connection: true});
+    
+    socket.on("welcome", function(response){
+        $("#chatbox").append("<div class='chatenter'>" + $("#chat-name").val() +" has entered chatroom</div>")
+    });
+
+    $("#chat-form").submit(function(){
+        var info = $("#textbox").val();
+        var name = $("#chat-name").val();
+        var date = new Date();
+        var time = date.toLocaleTimeString();
+        
+        var message = "<p><div class='chattime'>" + time + "</div>" + " " + "<div class='chatname'>" + name + "</div>" + " " + "<div class='say'> says: " + "</div> " + info + "</p>";
+        socket.emit("message", {message: message})
+        $("#textbox").val("");
+        return false;
+    });
+
+    socket.on("newMessage", function(response){
+     $("#chatbox").append("<p>" + response.message + "</p>");
+    });
+
+    socket.on("feed", function(response){
+        for(var i = 0; i < response.messageFeed.length; i++) {
+            $("#chatbox").append("<p>" + response.messageFeed[i].message + "</p>")
+        };
+        var match_id = $("#match_id").val()
+        $.post("/count", {count: response.messageFeed.length, match_id: match_id}, function(res){
+            console.log(res.result);
+        });
+
+    });
+ 
+</script>

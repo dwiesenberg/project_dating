@@ -1,0 +1,49 @@
+<nav>
+  <div class="nav-wrapper light-blue accent-1">
+    <div class="col s6">
+       <a href="/user/<%= current_user.id %>" class="brand-logo left">Tender</a> 
+    </div>
+  </div>
+</nav>
+
+<div class="containerRegister container">
+        <div class="input-field col s6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Answer <span class="first_name"><%= @user.first_name %>'s </span> questions here</h3>
+            </div>
+    <div class="panel-body">
+				<form action="/answer"method="post" enctype="multipart/form-data">
+                	<input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+                	<input type="hidden" name="user_id" value="<%= current_user.id %>">
+                	<fieldset class="z-depth-1">
+                   			<% if @questions %>
+                			<% @questions.each do |q| %>
+                	<input type="hidden" name="personal_question_id" value="<%= q.id %>">
+                		<div class="form-group">
+                			<p>
+                				<%= q.q1 %>
+                				<textarea name="a1"></textarea>
+                			</p>
+                		</div>
+                		<div class="form-group">
+                			<p>
+                				<%= q.q2 %>
+                				<textarea name="a2"></textarea>
+                			</p>
+                		</div>
+                		<div class="form-group">
+                			<p>
+                				<%= q.q3 %>
+                				<textarea name="a3"></textarea>
+                			</p>
+                		</div>
+                			<% end %>
+							<% end %>
+					<input class="btn waves-light btn-large light-blue accent-1" type="submit" value="Submit">
+					</fieldset>
+				</form>
+			</div>
+          </div>
+        </div>
+</div>

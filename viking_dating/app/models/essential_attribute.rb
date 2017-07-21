@@ -1,0 +1,2 @@
+class EssentialAttribute < ApplicationRecord
+end
