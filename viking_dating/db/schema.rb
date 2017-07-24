@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170721022742) do
+ActiveRecord::Schema.define(version: 20170723194532) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,8 +22,7 @@ ActiveRecord::Schema.define(version: 20170721022742) do
     t.integer  "client_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
-    t.index ["client_id"], name: "index_answers_on_client_id", using: :btree
-    t.index ["question_id"], name: "index_answers_on_question_id", using: :btree
+    t.index ["client_id", "question_id"], name: "index_answers_on_client_id_and_question_id", unique: true, using: :btree
   end
 
   create_table "choices", force: :cascade do |t|
@@ -32,7 +31,7 @@ ActiveRecord::Schema.define(version: 20170721022742) do
     t.integer  "question_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
-    t.index ["question_id"], name: "index_choices_on_question_id", using: :btree
+    t.index ["question_id", "position"], name: "index_choices_on_question_id_and_position", unique: true, using: :btree
   end
 
   create_table "clients", force: :cascade do |t|
@@ -49,6 +48,17 @@ ActiveRecord::Schema.define(version: 20170721022742) do
     t.datetime "updated_at",   null: false
   end
 
+  create_table "clients_matches", force: :cascade do |t|
+    t.integer  "score"
+    t.integer  "thumb"
+    t.integer  "matcher_id", null: false
+    t.integer  "matchee_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matcher_id", "matchee_id"], name: "index_clients_matches_on_matcher_id_and_matchee_id", unique: true, using: :btree
+    t.index ["matcher_id", "thumb", "score"], name: "index_clients_matches_on_matcher_id_and_thumb_and_score", order: { thumb: :desc, score: :desc }, using: :btree
+  end
+
   create_table "essential_attributes", force: :cascade do |t|
     t.string   "geographical_area"
     t.string   "sex"
@@ -59,25 +69,18 @@ ActiveRecord::Schema.define(version: 20170721022742) do
     t.datetime "updated_at",        null: false
   end
 
-  create_table "matches", force: :cascade do |t|
-    t.integer  "score"
-    t.integer  "thumb"
-    t.integer  "matcher_id", null: false
-    t.integer  "matched_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["matcher_id", "matched_id"], name: "index_matches_on_matcher_id_and_matched_id", unique: true, using: :btree
-  end
-
   create_table "messages", force: :cascade do |t|
     t.text     "message_text"
-    t.integer  "sender_id",      null: false
-    t.integer  "recipient_id",   null: false
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-    t.text     "sender_type"
-    t.text     "recipient_type"
-    t.index ["sender_id", "recipient_id"], name: "index_messages_on_sender_id_and_recipient_id", unique: true, using: :btree
+    t.integer  "sendable_id",                        null: false
+    t.integer  "receivable_id",                      null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.text     "sendable_type"
+    t.text     "receivable_type"
+    t.boolean  "read",               default: false
+    t.integer  "desire_to_like_you", default: 0
+    t.index ["read", "updated_at"], name: "index_messages_on_read_and_updated_at", using: :btree
+    t.index ["sendable_id", "receivable_id"], name: "index_messages_on_sendable_id_and_receivable_id", unique: true, using: :btree
   end
 
   create_table "questions", force: :cascade do |t|
