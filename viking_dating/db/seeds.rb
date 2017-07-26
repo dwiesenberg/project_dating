@@ -41,11 +41,16 @@ puts "Creating 15 clients..."
 end
 puts "15 clients created."
 
+# Create EssentialAttributes
 
- Client.create(first_name: Faker::Name.first_name,
-                 last_name: Faker::Name.last_name,
-                 email: Faker::Internet.free_email("Nancy"))
-
+Client.all.each do |client|
+  min_age = [20, 30, 40, 50].sample
+  max_age = min_age + 10
+  EssentialAttribute.create(sex: %w(M F).sample,
+                             min_age: min_age,
+                             max_age: max_age,
+                             client_id: client.id)
+end
 
 # Create Question and Choice
 Question.create(question_text: "Where do you want to live?")
@@ -75,45 +80,103 @@ Client.all.each do |client|
   end
 end
 
+# Create Message ... by/to random clients (incl a returned message from recipient), with various values in fields "read" and "desire_to_like_you"
+10.times do |i| 
+  sendable_id = Client.pluck(:id).sample
+  receivable_id = Client.pluck(:id).sample until receivable_id != sendable_id # must not send to oneself
+  read = false; read = true if i == 7 
+  message = Message.create( message_text: Faker::Lorem.sentences(2),
+                  sendable_id: sendable_id,
+                  receivable_id: receivable_id,
+                  sendable_type: "Client",
+                  receivable_type: "Client",
+                  read: read,
+                  desire_to_like_you: rand(-1..+1)
+                  )
+end
+# receiver gets message and sends back message
+sendable_id = Client.pluck(:id).sample
+receivable_id = Client.pluck(:id).sample until receivable_id != sendable_id # must not send to oneself
+  # sender
+Message.create( message_text: Faker::Lorem.sentences(2),
+                sendable_id: sendable_id,
+                receivable_id: receivable_id,
+                sendable_type: "Client",
+                receivable_type: "Client",
+                read: true,
+                desire_to_like_you: 1
+                )
+  # receiver
+Message.create( message_text: Faker::Lorem.sentences(2),
+                sendable_id: receivable_id,
+                receivable_id: sendable_id,
+                sendable_type: "Client",
+                receivable_type: "Client",
+                read: false,
+                desire_to_like_you: 1
+                )
 
 
-    Answer.create(
-              choice_id: 3,
-              priority: 1,
-              question_id: 1,
-              client_id: 4
-              )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-####################################
-
-
-
-def generate_address(stored_address_type, stored_address_id)
-  Address.create(street_address: Faker::Address.street_address,
-                 city: Faker::Address.city,
-                 state_abbr: Faker::Address.state_abbr,
-                 zip: Faker::Address.zip,
-                 stored_address_type: stored_address_type,
-                 stored_address_id: stored_address_id)
+# Create ClientsMatch
+Client.all.each do |matcher|
+  Client.all.each do |matchee|
+    next if matcher.id == matchee.id
+    # here assess match of essential attributes
+    unless essential_attributes_pass?(matcher, matchee)
+      match_score = -1
+    else
+      # here calculate scores
+      match_score = calculate_match_score(matcher, matchee)
+    end
+    clientsmatch = ClientsMatch.create(score: match_score,
+                          thumb: 0,
+                          matcher_id: matcher.id,
+                          matchee_id: matchee.id)
+  end
 end
 
-#Create Clients
-puts "Creating 10 clients..."
-10.times do |i|  
-  client = Client.create(name: Faker::Company.name)
-  generate_address("Client", client.id)
+def essential_attributes_test?(matcher, matchee)
+  matcher_attr = matcher.essential_attributes
+  matchee_attr = matchee.essential_attributes
+  return false if matcher_attr.first.sex != matchee.sex || \
+  (matcher_attr.first.max_age..matcher_attr.first.min_age) === matchee.age
+  true
 end
-puts "10 clients created."
+
+def calculate_match_score(matcher, matchee)
+  score = 0
+  matcher.answers.order("question_id").each do |answer|
+    if answer.choice_id == matchee.answers.where("question_id = ?", answer.question_id).first.choice_id
+      score += answer.priority
+    end
+  end
+  score
+end
+
+# Create VikingCoordinator
+VikingCoordinator.create(name: "Erik Trautman")
+
+# Create Message ... VikingCoordinator to random client and v.v.  (incl a returned message from recipient) and "desire_to_like_you" set to zero.
+
+sendable_id = VikingCoordinator.id
+receivable_id = Client.pluck(:id).sample
+  # sender
+Message.create( message_text: Faker::Lorem.sentences(2),
+                sendable_id: sendable_id,
+                receivable_id: receivable_id,
+                sendable_type: "Viking Coordinator",
+                receivable_type: "Client",
+                read: true,
+                desire_to_like_you: 0
+                )
+  # receiver
+Message.create( message_text: Faker::Lorem.sentences(2),
+                sendable_id: receivable_id,
+                receivable_id: sendable_id,
+                sendable_type: "Client",
+                receivable_type: "Viking Coordinator",
+                read: false,
+                desire_to_like_you: 0
+                )
+
+

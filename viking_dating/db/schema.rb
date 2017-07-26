@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170723194532) do
+ActiveRecord::Schema.define(version: 20170726010859) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,24 +49,23 @@ ActiveRecord::Schema.define(version: 20170723194532) do
   end
 
   create_table "clients_matches", force: :cascade do |t|
-    t.integer  "score"
-    t.integer  "thumb"
-    t.integer  "matcher_id", null: false
-    t.integer  "matchee_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer  "score",      default: 0
+    t.integer  "thumb",      default: 0
+    t.integer  "matcher_id",             null: false
+    t.integer  "matchee_id",             null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
     t.index ["matcher_id", "matchee_id"], name: "index_clients_matches_on_matcher_id_and_matchee_id", unique: true, using: :btree
     t.index ["matcher_id", "thumb", "score"], name: "index_clients_matches_on_matcher_id_and_thumb_and_score", order: { thumb: :desc, score: :desc }, using: :btree
   end
 
   create_table "essential_attributes", force: :cascade do |t|
-    t.string   "geographical_area"
     t.string   "sex"
     t.integer  "min_age"
     t.integer  "max_age"
-    t.integer  "user_id"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.integer  "client_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "messages", force: :cascade do |t|
